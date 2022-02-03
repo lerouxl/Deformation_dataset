@@ -3,6 +3,7 @@ from tqdm import tqdm
 from pathlib import Path
 from InherentStrain import InherentStrain
 from cubes_generator import generate_cubes
+from check_edges_number import remove_not_exact
 import os
 import pyvista as pv
 import numpy as np
@@ -11,7 +12,7 @@ logger_path = "Logs.log"
 logging.basicConfig(format='%(asctime)s - %(message)s', filename=logger_path, level=logging.DEBUG)
 
 def generate_dataset(dataset_path: Path, final_path: Path, number_sample: int = 100,
-                    max_edge_size: float = 2.0, noise: float = 0.001, 
+                    max_edge_size: float = 2.0, noise: float = 0.001, edges_target: int = 3000,
                     number_of_vert: int = 2000, gmsh_path: str = r"gmsh-3.0.6-Linux64/bin/gmsh" ):
     """
     Generate the dataset for AM simulation.
@@ -21,6 +22,7 @@ def generate_dataset(dataset_path: Path, final_path: Path, number_sample: int = 
         - number_sample: how many stl files to generate
         - max_edge_size: max size of edges, BEFORE DECIMATION
         - noise: size of the noise added to the cubes
+        - edges_target: number of edges to have per file
         - number_of_vert defimation target
         - gmsh_path: Where is gmsh 3.0.6
 
@@ -32,6 +34,8 @@ def generate_dataset(dataset_path: Path, final_path: Path, number_sample: int = 
     # Generate the cubes obj files
     generate_cubes(path = dataset_path, number_sample = number_sample, noise=noise, number_of_vert= number_of_vert, max_edge_size = max_edge_size)
 
+    # Remove files with the wrong number of edges:
+    remove_not_exact(folder_path= dataset_path, edges_target=edges_target )
     # Generate the msh file of each obj
     os.system(f"python3 stl_to_msh.py --path_stl {dataset_path}")
 
@@ -86,9 +90,10 @@ for phase in tqdm(["train", "test", "validation"]):
     max_edge_size = 1.4
     noise = 0.005
     number_of_vert = 2000
+    edges_target = 3000
     gmsh_path = r"gmsh-3.0.6-Linux64/bin/gmsh"
 
     logging.info(f"Start generating dataset")
-    logging.info(f"Phase {phase} parameters: \n\tnumber_sample:{number_sample} \n\tnoise:{noise} \n\tnumber_of_vert:{number_of_vert} \n\tmax_edge_size:{max_edge_size}")
-    generate_dataset(dataset_path, final_path, number_sample,max_edge_size, noise, number_of_vert,gmsh_path)
+    logging.info(f"Phase {phase} parameters: \n\tnumber_sample:{number_sample} \n\tnoise:{noise} \n\tnumber_of_vert:{number_of_vert} \n\tedges_target:{edges_target} \n\tmax_edge_size:{max_edge_size}")
+    generate_dataset(dataset_path, final_path, number_sample,max_edge_size, noise,edges_target, number_of_vert,gmsh_path)
 
