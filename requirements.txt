@@ -1,0 +1,10 @@
+numpy 
+scikit-sparse
+meshio
+scipy
+shapely 
+triangle 
+pymeshlab
+tqdm
+pyvista
+gmsh
