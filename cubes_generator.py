@@ -117,3 +117,48 @@ def generate_cubes(path: Path, number_sample: int = 1, noise: float = 0.001, nam
             logging.debug(f"cubes N {i}: Finished")
         except Exception as e:
             logging.critical(e, exc_info=True)
+
+def generate_polygon(path: Path, number_sample: int = 1, noise: float = 0.001, name_prefix: str = "cube_", 
+                    height_max: float = 30, height_min: float = 10 ,  max_edge_size: float = 1.0 ,number_of_vert: int = 1500):
+    """
+    Generate number_samble polygon with random dimension and number of edges.
+    Args:
+        path: pathlib.Path: where to save the result
+        number_sample: int, how many cubes to generate
+        noise: float: size of the noise to add at each cube. This cubes his needed for the faces reducion step.
+        name_prefix: str, prefix added to the name of the saved cubes.
+        height_max: float = 30 Maximum size of the cubes (not just height, deep and width of the cubes)
+        height_min: float = 10 Minimum size of the cubes (not just height, deep and width of the cubes)
+        max_edge_size: float = 1.0 Maximum size of the edges BEFORE the decimation
+        number_of_vert: int = 1500 Number of faces AFTER the decimation (will change the max edge size of the mesh)
+    """
+    for i in tqdm(range(number_sample), total=number_sample):
+        try:
+            logging.debug(f"cubes N {i}: starting dimension generation")
+            height = random.uniform(height_min, height_max)
+            segments = random.randint(4,10)
+            radius = random.uniform(height_min, height_max)
+            polygon = trimesh.path.polygons.random_polygon(segments= segments, radius = radius)
+            extrusion = trimesh.primitives.Extrusion(polygon=polygon, height = height)
+            vert , faces = trimesh.remesh.subdivide_to_size(extrusion.vertices, extrusion.faces, max_edge=max_edge_size)
+
+            logging.debug(f"cubes N {i}: subdivision finished")
+
+            box = trimesh.base.Trimesh(vertices =vert  , faces = faces)
+            box = trimesh.permutate.noise(box, noise)
+            logging.debug(f"cubes N {i}: noised added")
+            box = reduce(box, number_of_vert)
+            logging.debug(f"cubes N {i}: reduce finished")
+
+            # Put z_min = z_mov = 0
+            z_min = - min(box.vertices[:,2])
+            z_mov = trimesh.transformations.translation_matrix(direction=[0,0,z_min])
+            box.apply_transform(z_mov)
+            export_path = path / f"{i}.obj"     
+            box.export(export_path)
+            box.export(export_path.with_suffix(".stl"))
+            # remove the first line of the obj, with is a comment and made GMSH crash
+            #os.system(f"sed -i '1d' {export_path}")
+            logging.debug(f"cubes N {i}: Finished")
+        except Exception as e:
+            logging.critical(e, exc_info=True)
