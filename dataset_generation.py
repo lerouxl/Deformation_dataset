@@ -78,27 +78,27 @@ def generate_dataset(dataset_path: Path, final_path: Path, number_sample: int = 
         mesh.export(final_path / Path(vtu.name.split("._")[0]).with_suffix(".obj"))
 
 
+if __name__ == "__main__":
+    for phase in tqdm(["train", "test", "validation"]):
 
-for phase in tqdm(["train", "test", "validation"]):
+        # where will be stored the dataset
+        dataset_path = Path("cubes_process") / phase # Where all the temps files are saved
+        final_path = Path("cubes") / phase # Where the AI will take his inputs
 
-    # where will be stored the dataset
-    dataset_path = Path("cubes_process") / phase # Where all the temps files are saved
-    final_path = Path("cubes") / phase # Where the AI will take his inputs
+        if phase == "train":
+            number_sample = 6000
+        if phase == "test":
+            number_sample = 2000
+        elif phase == "validation":
+            number_sample = 500
 
-    if phase == "train":
-        number_sample = 6000
-    if phase == "test":
-        number_sample = 2000
-    elif phase == "validation":
-        number_sample = 500
+        max_edge_size = 1.4
+        noise = 0.005
+        number_of_vert = 2000
+        edges_target = 3000
+        gmsh_path = r"gmsh-3.0.6-Linux64/bin/gmsh"
 
-    max_edge_size = 1.4
-    noise = 0.005
-    number_of_vert = 2000
-    edges_target = 3000
-    gmsh_path = r"gmsh-3.0.6-Linux64/bin/gmsh"
-
-    logging.info(f"Start generating dataset")
-    logging.info(f"Phase {phase} parameters: \n\tnumber_sample:{number_sample} \n\tnoise:{noise} \n\tnumber_of_vert:{number_of_vert} \n\tedges_target:{edges_target} \n\tmax_edge_size:{max_edge_size}")
-    generate_dataset(dataset_path, final_path, number_sample,max_edge_size, noise,edges_target, number_of_vert,gmsh_path)
+        logging.info(f"Start generating dataset")
+        logging.info(f"Phase {phase} parameters: \n\tnumber_sample:{number_sample} \n\tnoise:{noise} \n\tnumber_of_vert:{number_of_vert} \n\tedges_target:{edges_target} \n\tmax_edge_size:{max_edge_size}")
+        generate_dataset(dataset_path, final_path, number_sample,max_edge_size, noise,edges_target, number_of_vert,gmsh_path)
 
