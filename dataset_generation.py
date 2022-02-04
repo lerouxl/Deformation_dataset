@@ -7,6 +7,7 @@ from check_edges_number import remove_not_exact
 import os
 import pyvista as pv
 import numpy as np
+import trimesh 
 
 logger_path = "Logs.log"
 logging.basicConfig(format='%(asctime)s - %(message)s', filename=logger_path, level=logging.DEBUG)
@@ -71,6 +72,10 @@ def generate_dataset(dataset_path: Path, final_path: Path, number_sample: int = 
     
         # Save the displacement label
         np.savetxt( final_path / Path(vtu.name.split("._")[0]).with_suffix(".txt") , mesh.point_data["displacement"])
+
+        # Load and the mesh in obj
+        mesh = trimesh.load(final_path / Path(vtu.name.split("._")[0]).with_suffix(".stl"), process= True)
+        mesh.export(final_path / Path(vtu.name.split("._")[0]).with_suffix(".obj"))
 
 
 
