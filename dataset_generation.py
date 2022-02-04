@@ -67,7 +67,7 @@ def generate_dataset(dataset_path: Path, final_path: Path, number_sample: int = 
 
         # Save the mesh
         mesh.save(final_path / Path(vtu.name.split("._")[0]).with_suffix(".vtk"))
-        mesh.save(final_path / Path(vtu.name.split("._")[0]).with_suffix(".stl"))
+        mesh.save(final_path / Path(vtu.name.split("._")[0]).with_suffix(".stl"), binary=False)
     
         # Save the displacement label
         np.savetxt( final_path / Path(vtu.name.split("._")[0]).with_suffix(".txt") , mesh.point_data["displacement"])
@@ -81,11 +81,11 @@ for phase in tqdm(["train", "test", "validation"]):
     final_path = Path("cubes") / phase # Where the AI will take his inputs
 
     if phase == "train":
-        number_sample = 20
+        number_sample = 6000
     if phase == "test":
-        number_sample = 10
+        number_sample = 2000
     elif phase == "validation":
-        number_sample = 5
+        number_sample = 500
 
     max_edge_size = 1.4
     noise = 0.005
