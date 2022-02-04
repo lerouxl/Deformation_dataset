@@ -2,7 +2,7 @@ import logging
 from tqdm import tqdm
 from pathlib import Path
 from InherentStrain import InherentStrain
-from cubes_generator import generate_cubes
+from cubes_generator import generate_polygon
 from check_edges_number import remove_not_exact
 import os
 import pyvista as pv
@@ -33,7 +33,7 @@ def generate_dataset(dataset_path: Path, final_path: Path, number_sample: int = 
     final_path.mkdir(parents=True, exist_ok=True)
 
     # Generate the cubes obj files
-    generate_cubes(path = dataset_path, number_sample = number_sample, noise=noise, number_of_vert= number_of_vert, max_edge_size = max_edge_size)
+    generate_polygon(path = dataset_path, number_sample = number_sample, noise=noise, number_of_vert= number_of_vert, max_edge_size = max_edge_size)
 
     # Remove files with the wrong number of edges:
     remove_not_exact(folder_path= dataset_path, edges_target=edges_target )
@@ -82,8 +82,8 @@ if __name__ == "__main__":
     for phase in tqdm(["train", "test", "validation"]):
 
         # where will be stored the dataset
-        dataset_path = Path("cubes_process") / phase # Where all the temps files are saved
-        final_path = Path("cubes") / phase # Where the AI will take his inputs
+        dataset_path = Path("polygon_process") / phase # Where all the temps files are saved
+        final_path = Path("polygon") / phase # Where the AI will take his inputs
 
         if phase == "train":
             number_sample = 6000
