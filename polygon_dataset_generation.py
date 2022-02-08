@@ -4,6 +4,7 @@ from pathlib import Path
 from InherentStrain import InherentStrain
 from cubes_generator import generate_polygon
 from check_edges_number import remove_not_exact
+from vtk_extract_correction import extraction_correction
 import os
 import pyvista as pv
 import numpy as np
@@ -101,4 +102,7 @@ if __name__ == "__main__":
         logging.info(f"Start generating dataset")
         logging.info(f"Phase {phase} parameters: \n\tnumber_sample:{number_sample} \n\tnoise:{noise} \n\tnumber_of_vert:{number_of_vert} \n\tedges_target:{edges_target} \n\tmax_edge_size:{max_edge_size}")
         generate_dataset(dataset_path, final_path, number_sample,max_edge_size, noise,edges_target, number_of_vert,gmsh_path)
+
+        logging.info(f"Start correcting the dataset")
+        extraction_correction(final_path)
 
