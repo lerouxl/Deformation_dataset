@@ -32,7 +32,7 @@ def reduce(mesh:trimesh.base.Trimesh, max_faces_number: int, show_evolution: boo
         if number_of_step < 10:
             number_of_step = 10
         elif number_of_step > 10000:
-            number_of_step = 1000
+            number_of_step = 10000
         logging.debug(f"\t will be reduced in {number_of_step} steps")
 
         b = ms.current_mesh().face_number()
